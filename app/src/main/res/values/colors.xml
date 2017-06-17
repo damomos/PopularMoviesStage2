@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#202020</color>
+    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="empty_view_text_color">#BCBCBC</color>
+    <color name="text_color_for_movie_overview">@android:color/black</color>
+    <color name="text_color_for_review_content">@android:color/black</color>
+</resources>
