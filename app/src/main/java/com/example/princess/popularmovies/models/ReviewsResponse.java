@@ -13,7 +13,7 @@ import static android.R.attr.id;
 public class ReviewsResponse {
 
     @SerializedName("id")
-    private int id;
+    private String id;
 
     @SerializedName("page")
     private int page;
@@ -28,11 +28,11 @@ public class ReviewsResponse {
     private int totalPages;
 
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

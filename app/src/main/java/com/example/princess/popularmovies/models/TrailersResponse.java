@@ -13,16 +13,16 @@ import static android.R.attr.id;
 public class TrailersResponse {
 
     @SerializedName("id")
-    private int id;
+    private String id;
 
     @SerializedName("results")
     private List<Trailers> trailers;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

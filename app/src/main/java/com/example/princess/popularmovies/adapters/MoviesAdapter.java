@@ -66,7 +66,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
     public void onBindViewHolder(MoviesAdapter.MoviesViewHolder holder, int position) {
 
         Movies image = moviesList.get(position);
-        String posterPath_url = "http://image.tmdb.org/t/p/w185" + image.getPosterPath();
+        String posterPath_url = "http://image.tmdb.org/t/p/w500" + image.getPosterPath();
         // load image into imageview using picasso
         Picasso.with(mContext).load(posterPath_url).placeholder(R.mipmap.placeholder).into(holder.posterImage);
 

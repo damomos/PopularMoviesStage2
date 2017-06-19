@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
+    <string name="action_share">Share</string>
     <string name="title_activity_movie_details">Movie Details</string>
 
     <string name="title_for_empty_view">No movies</string>
     <string name="text_for_empty_view">Possible internet connection is missing</string>
     <string name="title_for_empty_view_favorites">No movies</string>
     <string name="text_for_empty_view_favorites">You can add here your favorite movies</string>
+    <string name="user_rating_movie">TMDb: %1$s/10</string>
 
     <string name="popular">Popular</string>
     <string name="popular_summary">This will arrange the list in order of most popular to the least popular</string>

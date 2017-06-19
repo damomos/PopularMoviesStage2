@@ -46,6 +46,7 @@
                 android:value=".MoviesListActivity"/>
 
         </activity>
+
     </application>
 
 </manifest>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/coordinatorLayout"
+    android:id="@+id/coordinator_Layout"
     tools:context="com.example.princess.popularmovies.MoviesListActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -25,16 +25,6 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-
-    <!--<FrameLayout-->
-        <!--android:id="@+id/frameLayout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
-
-        <!--<include layout="@layout/movies_list" />-->
-    <!--</FrameLayout>-->
 
     <include layout="@layout/empty_state_connection" />
 

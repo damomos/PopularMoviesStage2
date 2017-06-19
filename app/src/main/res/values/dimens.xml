@@ -1,11 +1,12 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="app_bar_height">280dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
     <dimen name="trailer_width_for_detail">150dp</dimen>
-    <dimen name="trailer_height_for_detail">150dp</dimen>
+    <dimen name="trailer_height_for_detail">100dp</dimen>
     <dimen name="detail_vertical_padding">8dp</dimen>
     <dimen name="detail_horizontal_padding">16dp</dimen>
     <dimen name="trailer_list_vertical_padding">16dp</dimen>
+    <dimen name="item_offset">5dp</dimen>
 </resources>

@@ -3,6 +3,8 @@ package com.example.princess.popularmovies.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +30,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
     private Context context;
     private List<Trailers> trailersList;
-    String videoUrl;
+    String thumbnailUrl;
 
     public TrailersAdapter(Context context, List<Trailers> trailersList){
         this.context = context;
@@ -61,8 +63,6 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("VIDEO_ID", videoId);
                 context.startActivity(intent);
-
-                Toast.makeText(v.getContext(), "You clicked " + clickedDataItem.getName(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -79,10 +79,9 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
         Trailers video = trailersList.get(position);
         holder.mIcon.setImageResource(R.drawable.ic_play_circle_outline_black_32dp);
-        videoUrl = "https://www.youtube.com/watch?v=" + video.getKey() + "/0.jpg";
+        thumbnailUrl = "http://img.youtube.com/vi/" + video.getKey() + "/0.jpg";
         Picasso.with(context)
-                .load(videoUrl)
-                .placeholder(R.mipmap.videoholder)
+                .load(thumbnailUrl)
                 .into(holder.mTrailer);
     }
 

@@ -7,12 +7,16 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static com.example.princess.popularmovies.data.MoviesContentProvider.MovieEntry.TABLE_DETAILS;
+import static com.example.princess.popularmovies.data.MoviesContract.AUTHORITY;
+import static com.example.princess.popularmovies.data.MoviesContract.MovieEntry.TABLE_DETAILS;
+import static com.example.princess.popularmovies.data.MoviesContract.PATH_FAVORITE;
+import static com.example.princess.popularmovies.data.MoviesContract.PATH_MOVIE;
 
 /**
  * Created by Princess on 6/15/2017.
@@ -20,39 +24,11 @@ import static com.example.princess.popularmovies.data.MoviesContentProvider.Movi
 
 public class MoviesContentProvider extends ContentProvider {
 
-    // The authority, which is how your code knows which Content Provider to access
-    public static final String AUTHORITY = "com.example.princess.popularmovies";
 
-    // The base content URI = "content://" + <authority>
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
-
-    // Define the possible paths for accessing data in this contract
-    // This is the path for the "tasks" directory
-    public static final String PATH_MOVIE = "movie";
-
-    public static final class MovieEntry implements BaseColumns {
-
-        // MovieEntry content URI = base content URI + path
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
-
-        //Movie Tables name
-        public static final String TABLE_DETAILS = "details";
-        public static final String TABLE_FAVOURITE = "favourite";
-
-        //Movies Columns names
-        public static final String COLUMN_POSTER_PATH = "poster_path";
-        public static final String COLUMN_OVERVIEW = "overview";
-        public static final String COLUMN_DATE = "date";
-        public static final String COLUMN_TITLE = "title";
-        public static final String COLUMN_RATING = "rating";
-
-        //This creates the columns for the favourite table
-        public static final String COLUMN_FAVOURITE = "favourite";
-        public static final String COLUMN_POSTERPATH = "posterPath";
-    }
 
     public static final int MOVIE = 1;
     public static final int MOVIE_WITH_ID = 2;
+    static final int FAVORITES = 5;
 
     //Declare a static variable for the Uri matcher that you construct
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -63,11 +39,43 @@ public class MoviesContentProvider extends ContentProvider {
 
         uriMatcher.addURI(AUTHORITY, PATH_MOVIE, MOVIE);
         uriMatcher.addURI(AUTHORITY,PATH_MOVIE + "/#", MOVIE_WITH_ID);
+        uriMatcher.addURI(AUTHORITY, PATH_MOVIE + "/" + PATH_FAVORITE, FAVORITES);
         return uriMatcher;
     }
 
     private MoviesDbHelper mMoviesDbHelper;
 
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        final SQLiteDatabase db = mMoviesDbHelper.getWritableDatabase();
+
+        switch (sUriMatcher.match(uri)) {
+
+            case MOVIE:
+                db.beginTransaction();
+                int rowsInserted = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(MoviesContract.MovieEntry.TABLE_DETAILS, null, value);
+                        if (_id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if (rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsInserted;
+
+            default:
+                return super.bulkInsert(uri, values);
+        }
+    }
 
     @Override
     public boolean onCreate() {
@@ -80,36 +88,57 @@ public class MoviesContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
 
-        // Get access to underlying database (read-only for query)
-        final SQLiteDatabase db = mMoviesDbHelper.getReadableDatabase();
+        Cursor cursor;
 
-        // Write URI match code and set a variable to return a Cursor
-        int movie = sUriMatcher.match(uri);
-        Cursor retCursor;
+        switch (sUriMatcher.match(uri)){
 
-        // Query for the tasks directory and write a default case
-        switch (movie) {
-            // Query for the tasks directory
+            case MOVIE_WITH_ID:
+            {
+                String movieId = uri.getLastPathSegment();
+
+                String [] selectionArguments = new String []{movieId};
+                cursor = mMoviesDbHelper.getReadableDatabase().query(
+                        MoviesContract.MovieEntry.TABLE_DETAILS,
+                        projection,
+                        MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
+                        selectionArguments,
+                        null,
+                        null,
+                        sortOrder);
+
+                break;
+            }
+
             case MOVIE:
-                retCursor =  db.query(TABLE_DETAILS,
+            {
+                cursor = mMoviesDbHelper.getReadableDatabase().query(
+                        MoviesContract.MovieEntry.TABLE_DETAILS,
                         projection,
                         selection,
+                        selectionArgs,
                         null,
                         null,
-                        null,
-                        null);
+                        sortOrder);
+
                 break;
-            // Default exception
+            }
+
+            case FAVORITES:
+
+                cursor = getMoviesFromReferenceTable(MoviesContract.FavoriteEntry.TABLE_FAVOURITE,
+                        projection, selection, selectionArgs, sortOrder);
+                break;
+
             default:
-                throw new UnsupportedOperationException("Unknown uri: " + uri);
+                throw new
+
+                        UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        // Set a notification URI on the Cursor and return that Cursor
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
+        }
 
-        // Return the desired Cursor
-        return retCursor;
-    }
 
     @Nullable
     @Override
@@ -120,26 +149,20 @@ public class MoviesContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        //Get access to database to write data into it
-        final SQLiteDatabase db = mMoviesDbHelper.getWritableDatabase();
-
-        int movie = sUriMatcher.match(uri);
+        SQLiteDatabase db = mMoviesDbHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
         Uri returnUri;
+        long id;
+        switch (match) {
 
-
-        switch(movie){
-            case MOVIE:
-                // Insert new values into the database
-                // Inserting values into tasks table
-                long id = db.insert(TABLE_DETAILS, null, values);
-                if ( id > 0 ) {
-                    returnUri = ContentUris.withAppendedId(MovieEntry.CONTENT_URI, id);
+            case FAVORITES:
+                id = db.insert(MoviesContract.FavoriteEntry.TABLE_FAVOURITE, null, values);
+                if (id > 0) {
+                    returnUri = MoviesContract.FavoriteEntry.CONTENT_URI;
                 } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                    throw new android.database.SQLException("failed to insert into row" + uri);
                 }
                 break;
-            // Set the value for the returnedUri and write the default case for unknown URI's
-            // Default case throws an UnsupportedOperationException
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -149,11 +172,71 @@ public class MoviesContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+
+         /* Users of the delete method will expect the number of rows deleted to be returned. */
+        int numRowsDeleted;
+
+        /*
+         * If we pass null as the selection to SQLiteDatabase#delete, our entire table will be
+         * deleted. However, if we do pass null and delete all of the rows in the table, we won't
+         * know how many rows were deleted. According to the documentation for SQLiteDatabase,
+         * passing "1" for the selection will delete all rows and return the number of rows
+         * deleted, which is what the caller of this method expects.
+         */
+        if (null == selection) selection = "1";
+
+        switch (sUriMatcher.match(uri)) {
+
+            case MOVIE:
+                numRowsDeleted = mMoviesDbHelper.getWritableDatabase().delete(
+                        MoviesContract.MovieEntry.TABLE_DETAILS,
+                        selection,
+                        selectionArgs);
+
+                break;
+            case FAVORITES:
+                numRowsDeleted = mMoviesDbHelper.getWritableDatabase().delete(
+                        MoviesContract.FavoriteEntry.TABLE_FAVOURITE,
+                        selection,
+                        selectionArgs);
+
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        /* If we actually deleted any rows, notify that a change has occurred to this URI */
+        if (numRowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return numRowsDeleted;
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
+    }
+
+    private Cursor getMoviesFromReferenceTable(String tableFavourite, String[] projection,
+                                               String selection, String[] selectionArgs, String sortOrder) {
+
+        SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
+
+        // tableName INNER JOIN movies ON tableName.movie_id = movies._id
+        sqLiteQueryBuilder.setTables(
+                tableFavourite + " INNER JOIN " + MoviesContract.MovieEntry.TABLE_DETAILS +
+                        " ON " + tableFavourite + "." + MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID_KEY +
+                        " = " + MoviesContract.MovieEntry.TABLE_DETAILS+ "." + MoviesContract.MovieEntry._ID
+        );
+
+        return sqLiteQueryBuilder.query(mMoviesDbHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
     }
 }

@@ -38,7 +38,7 @@ public class Movies implements Parcelable {
     private String title;
 
     @SerializedName("vote_average")
-    private Double rating;
+    private String rating;
 
     @SerializedName("backdrop_path")
     private String backdropPath;
@@ -51,7 +51,8 @@ public class Movies implements Parcelable {
         date = in.readString();
         id = in.readString();
         title = in.readString();
-        rating = in.readDouble();
+        rating = in.readString();
+        backdropPath = in.readString();
     }
 
     @Override
@@ -66,7 +67,8 @@ public class Movies implements Parcelable {
         dest.writeString(date);
         dest.writeString(id);
         dest.writeString(title);
-        dest.writeDouble(rating);
+        dest.writeString(rating);
+        dest.writeString(backdropPath);
 
     }
 
@@ -96,7 +98,7 @@ public class Movies implements Parcelable {
         return overview;
     }
 
-    public Double getRating() {
+    public String getRating() {
         return rating;
     }
 
@@ -108,7 +110,7 @@ public class Movies implements Parcelable {
         this.title = title;
     }
 
-    public void setRating(Double rating) {
+    public void setRating(String rating) {
 
         this.rating = rating;
     }

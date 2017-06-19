@@ -5,6 +5,8 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="empty_view_text_color">#BCBCBC</color>
-    <color name="text_color_for_movie_overview">@android:color/black</color>
-    <color name="text_color_for_review_content">@android:color/black</color>
+    <color name="text_color_for_title">#000</color>
+    <color name="text_for_rating">#585858</color>
+    <color name="text_color_for_movie_overview">#585858</color>
+    <color name="text_color_for_review_content">#585858</color>
 </resources>

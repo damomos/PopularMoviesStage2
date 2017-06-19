@@ -3,8 +3,6 @@
     android:id="@+id/reviews_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="@dimen/detail_horizontal_padding"
-    android:paddingRight="@dimen/detail_horizontal_padding"
     android:paddingTop="@dimen/detail_vertical_padding"
     android:paddingBottom="@dimen/detail_vertical_padding"
     android:foreground="?android:attr/selectableItemBackground"
@@ -13,7 +11,11 @@
     <TextView
         android:id="@+id/review_author"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:textColor="@color/text_color_for_review_content"/>
 
     <TextView
         android:id="@+id/review_content"
@@ -21,6 +23,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="5"
+        android:textSize="15sp"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/text_color_for_review_content" />
 

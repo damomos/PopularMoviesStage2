@@ -3,12 +3,17 @@ package com.example.princess.popularmovies;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,10 +22,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.princess.popularmovies.adapters.MoviesAdapter;
-import com.example.princess.popularmovies.data.FavoriteDbHelper;
+import com.example.princess.popularmovies.data.MoviesContract;
 import com.example.princess.popularmovies.models.Movies;
 import com.example.princess.popularmovies.models.MoviesResponse;
 import com.example.princess.popularmovies.rest.ApiClient;
@@ -34,7 +40,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MoviesListActivity extends AppCompatActivity {
+
+public class MoviesListActivity extends AppCompatActivity
+        //implements LoaderManager.LoaderCallbacks<Cursor>
+                                                            {
 
     private static final String TAG = MoviesListActivity.class.getSimpleName();
 
@@ -43,9 +52,13 @@ public class MoviesListActivity extends AppCompatActivity {
     private List<Movies> moviesList;
     boolean isConnected;
     private static SharedPreferences sharedPreferences;
-    private CoordinatorLayout coordinatorLayout;
+    private int mPosition = RecyclerView.NO_POSITION;
+    private ProgressBar mProgressBar;
 
     private static final String API_KEY = BuildConfig.MOVIE_API_KEY;
+
+    public static final int INDEX_MOVIE_POSTERPATH = 1;
+    public static final int ID_MOVIE_LOADER = 20;
 
 
     @Override
@@ -54,8 +67,6 @@ public class MoviesListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movies_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
         initViews();
 
@@ -89,7 +100,7 @@ public class MoviesListActivity extends AppCompatActivity {
         }
         mRecyclerView.setAdapter(mAdapter);
 
-       // getAllFavorite();
+        //getAllFavorite();
     }
 
     public void popular(){
@@ -98,8 +109,8 @@ public class MoviesListActivity extends AppCompatActivity {
         isConnected = ConnectionTest.isNetworkAvailable(this);
         if(isConnected) {
             if (API_KEY.isEmpty()) {
-                Snackbar bar = Snackbar.make(coordinatorLayout, R.string.api_key_error_message, Snackbar.LENGTH_LONG);
-                bar.show();
+                Toast.makeText(getApplicationContext(),R.string.api_key_error_message, Toast.LENGTH_LONG);
+
             }
             ApiService apiService = ApiClient.getClient().create(ApiService.class);
             Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY);
@@ -112,16 +123,13 @@ public class MoviesListActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                    Snackbar bar = Snackbar.make(coordinatorLayout, R.string.failure_message, Snackbar.LENGTH_LONG);
-                    bar.show();
+                    Toast.makeText(getApplicationContext(), R.string.failure_message, Toast.LENGTH_LONG).show();
                 }
             });
         }
         } catch (Exception e){
             Log.d("Error", e.getMessage());
-            Snackbar bar = Snackbar.make(coordinatorLayout, e.toString(), Snackbar.LENGTH_LONG);
-            bar.show();
-
+            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -131,8 +139,7 @@ public class MoviesListActivity extends AppCompatActivity {
             isConnected = ConnectionTest.isNetworkAvailable(this);
             if(isConnected) {
                 if (API_KEY.isEmpty()) {
-                    Snackbar bar = Snackbar.make(coordinatorLayout, R.string.api_key_error_message, Snackbar.LENGTH_LONG);
-                    bar.show();
+                    //Snackbar.make(parentLayout, R.string.api_key_error_message, Snackbar.LENGTH_LONG).show();
                 }
                 ApiService apiService = ApiClient.getClient().create(ApiService.class);
                 Call<MoviesResponse> call = apiService.getTopRatedMovies(API_KEY);
@@ -145,15 +152,13 @@ public class MoviesListActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                        Snackbar bar = Snackbar.make(coordinatorLayout, R.string.failure_message, Snackbar.LENGTH_LONG);
-                        bar.show();
+                        //Snackbar.make(parentLayout, R.string.failure_message, Snackbar.LENGTH_LONG).show();
                     }
                 });
             }
         } catch (Exception e){
             Log.d("Error", e.getMessage());
-            Snackbar bar = Snackbar.make(coordinatorLayout, e.toString(), Snackbar.LENGTH_LONG);
-            bar.show();
+            //Snackbar.make(parentLayout, e.toString(), Snackbar.LENGTH_LONG).show();
 
         }
     }
@@ -184,22 +189,12 @@ public class MoviesListActivity extends AppCompatActivity {
         }
     }
 
-//    private void getAllFavorite(){
-//        new AsyncTask<Void, Void, Void>(){
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
 //
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                moviesList.clear();
-//                moviesList.addAll(FavoriteDbHelper.getAllFavorite());
-//                return null;
-//            }
-//            @Override
-//            protected void onPostExecute(Void aVoid){
-//                super.onPostExecute(aVoid);
-//                mAdapter.notifyDataSetChanged();
-//            }
-//        }.execute();
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -224,4 +219,46 @@ public class MoviesListActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+//    @Override
+//    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+//        switch (id) {
+//
+//            case ID_MOVIE_LOADER:
+//                /* URI for all rows of movie data in our movie table */
+//                Uri movieQueryUri = MoviesContract.MovieEntry.CONTENT_URI;
+//
+//                return new CursorLoader(this,
+//                        movieQueryUri,
+//                        MoviesContract.MAIN_MOVIE_ROJECTION,
+//                        null,
+//                        null,
+//                        null);
+//
+//            default:
+//                throw new RuntimeException("Loader Not Implemented: " + id);
+//        }
+//    }
+//
+//    @Override
+//    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+//        return;
+//        //mAdapter.swapCursor(data);
+////        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+////        mRecyclerView.smoothScrollToPosition(mPosition);
+////        if (data.getCount() != 0) showMovieDataView();
+//    }
+//
+//    private void showMovieDataView() {
+////        /* First, hide the loading indicator */
+////        mProgressBar.setVisibility(View.INVISIBLE);
+////        /* Finally, make sure the movie data is visible */
+////        mRecyclerView.setVisibility(View.VISIBLE);
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader<Cursor> loader) {
+//        //mAdapter.swapCursor(null);
+//
+//    }
 }
