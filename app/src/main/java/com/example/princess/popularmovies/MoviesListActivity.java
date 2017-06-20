@@ -139,7 +139,7 @@ public class MoviesListActivity extends AppCompatActivity
             isConnected = ConnectionTest.isNetworkAvailable(this);
             if(isConnected) {
                 if (API_KEY.isEmpty()) {
-                    //Snackbar.make(parentLayout, R.string.api_key_error_message, Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), R.string.api_key_error_message, Toast.LENGTH_LONG).show();
                 }
                 ApiService apiService = ApiClient.getClient().create(ApiService.class);
                 Call<MoviesResponse> call = apiService.getTopRatedMovies(API_KEY);
@@ -152,13 +152,13 @@ public class MoviesListActivity extends AppCompatActivity
 
                     @Override
                     public void onFailure(Call<MoviesResponse> call, Throwable t) {
-                        //Snackbar.make(parentLayout, R.string.failure_message, Snackbar.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), R.string.failure_message, Toast.LENGTH_LONG).show();
                     }
                 });
             }
         } catch (Exception e){
             Log.d("Error", e.getMessage());
-            //Snackbar.make(parentLayout, e.toString(), Snackbar.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
 
         }
     }
