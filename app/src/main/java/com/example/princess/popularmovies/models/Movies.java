@@ -55,6 +55,16 @@ public class Movies implements Parcelable {
         backdropPath = in.readString();
     }
 
+    public Movies(String posterPath, String overview, String  date, String id, String title, String rating, String backdropPath){
+        this.posterPath = posterPath;
+        this.overview = overview;
+        this.date =  date;
+        this.id = id;
+        this.title = title;
+        this.rating = rating;
+        this.backdropPath = backdropPath;
+    }
+
     @Override
     public int describeContents() {
         return 0;

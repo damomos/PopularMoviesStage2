@@ -31,9 +31,9 @@
             android:label="@string/title_activity_movie_details"
             android:theme="@style/AppTheme.NoActionBar">
 
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".MoviesListActivity"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MoviesListActivity"/>
 
         </activity>
 
@@ -46,6 +46,13 @@
                 android:value=".MoviesListActivity"/>
 
         </activity>
+
+        <provider
+            android:authorities="com.example.princess.popularmovies"
+            android:name="com.example.princess.popularmovies.data.MoviesContentProvider"
+            android:exported="false">
+
+        </provider>
 
     </application>
 

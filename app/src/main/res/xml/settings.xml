@@ -10,10 +10,10 @@
             android:title="@string/popular" />
 
         <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="toprated_key"
-        android:summary="@string/top_summary"
-        android:title="@string/top_rated" />
+            android:defaultValue="false"
+            android:key="toprated_key"
+            android:summary="@string/top_summary"
+            android:title="@string/top_rated" />
 
         <CheckBoxPreference
             android:defaultValue="false"

@@ -38,10 +38,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
         //Constructor to get widget reference
         public MoviesViewHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(this);
 
             moviesLayout = (LinearLayout) itemView.findViewById(R.id.movies_layout);
             posterImage = (ImageView) itemView.findViewById(R.id.poster_image);
+            itemView.setOnClickListener(this);
         }
 
         @Override
@@ -54,11 +54,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
         }
     }
 
-
     @Override
     public MoviesAdapter.MoviesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-       View view = LayoutInflater.from(parent.getContext())
-               .inflate(R.layout.movies_list, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.movies_list, parent, false);
         return new MoviesViewHolder(view);
     }
 
@@ -67,7 +66,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
 
         Movies image = moviesList.get(position);
         String posterPath_url = "http://image.tmdb.org/t/p/w500" + image.getPosterPath();
-        // load image into imageview using picasso
+        // load image into image view using picasso
         Picasso.with(mContext).load(posterPath_url).placeholder(R.mipmap.placeholder).into(holder.posterImage);
 
     }

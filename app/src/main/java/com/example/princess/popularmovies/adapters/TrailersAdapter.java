@@ -55,7 +55,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
         @Override
         public void onClick(View v) {
-           int position = getAdapterPosition();
+            int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION){
                 Trailers clickedDataItem = trailersList.get(position);
                 String videoId = trailersList.get(position).getKey();

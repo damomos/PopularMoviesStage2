@@ -12,9 +12,9 @@
         android:id="@+id/review_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="5dp"
+        android:paddingBottom="@dimen/item_offset"
         android:textStyle="bold"
-        android:textSize="15sp"
+        android:textSize="@dimen/text_sizes"
         android:textColor="@color/text_color_for_review_content"/>
 
     <TextView
@@ -22,8 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:maxLines="5"
-        android:textSize="15sp"
+        android:maxLines="7"
+        android:textSize="@dimen/text_sizes"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/text_color_for_review_content" />
 
