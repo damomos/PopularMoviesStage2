@@ -2,6 +2,8 @@ package com.example.princess.popularmovies.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +12,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.example.princess.popularmovies.MovieDetailsActivity;
+import com.example.princess.popularmovies.MoviesListActivity;
 import com.example.princess.popularmovies.R;
 import com.example.princess.popularmovies.models.Movies;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import static android.os.Build.VERSION_CODES.M;
 
 /**
  * Created by Princess on 6/15/2017.
@@ -22,6 +27,7 @@ import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>{
 
+    private Cursor mCursor;
     private Context mContext;
     private List<Movies> moviesList;
 
@@ -63,6 +69,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
 
     @Override
     public void onBindViewHolder(MoviesAdapter.MoviesViewHolder holder, int position) {
+//        mCursor.moveToPosition(position);
+//        String posterPath_url = "http://image.tmdb.org/t/p/w500" + mCursor.getString();
 
         Movies image = moviesList.get(position);
         String posterPath_url = "http://image.tmdb.org/t/p/w500" + image.getPosterPath();

@@ -1,19 +1,10 @@
 package com.example.princess.popularmovies.data;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.VisibleForTesting;
-import android.text.TextUtils;
 import android.util.Log;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import static com.example.princess.popularmovies.data.MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID_KEY;
 
 /**
  * Created by Princess on 6/15/2017.
@@ -40,12 +31,15 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
 
     public static final String CREATE_FAVORITE_TABLE =
-            "CREATE TABLE " + MoviesContract.FavoriteEntry.TABLE_FAVOURITE + " (" +
-                    MoviesContract.FavoriteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_MOVIE_ID_KEY + " INTEGER NOT NULL, " +
-                    " FOREIGN KEY (" + COLUMN_MOVIE_ID_KEY + ") REFERENCES " +
-                    MoviesContract.MovieEntry.TABLE_DETAILS + " (" + MoviesContract.MovieEntry._ID + ") " +
-                    " );";
+            " CREATE TABLE " + MoviesContract.FavoriteEntry.TABLE_FAVOURITE + "(" +
+                    MoviesContract.FavoriteEntry._ID                + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID                + " INTEGER NOT NULL, " +
+                    MoviesContract.FavoriteEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
+                    MoviesContract.FavoriteEntry.COLUMN_BACKDROP_PATH + " TEXT NOT NULL, " +
+                    MoviesContract.FavoriteEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
+                    MoviesContract.FavoriteEntry.COLUMN_DATE + " TEXT NOT NULL, " +
+                    MoviesContract.FavoriteEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
+                    MoviesContract.FavoriteEntry.COLUMN_RATING + " TEXT NOT NULL);";
 
 
     public static final String[] MAIN_MOVIE_ROJECTION = {
@@ -67,19 +61,19 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
 
 
     private static final String TAG = "DBHelper";
-    private static MoviesDbHelper mInstance = null;
+    private static MoviesDbHelper moviesDbHelper = null;
     private Context context;
 
     public static synchronized MoviesDbHelper getInstance(Context context) {
-        if (mInstance == null) {
-            mInstance = new MoviesDbHelper(context.getApplicationContext());
+        if (moviesDbHelper == null) {
+            moviesDbHelper = new MoviesDbHelper(context.getApplicationContext());
         }
-        return mInstance;
+        return moviesDbHelper;
     }
 
     @VisibleForTesting
     public static void clearInstance() {
-        mInstance = null;
+        moviesDbHelper = null;
     }
 
     public MoviesDbHelper(Context context) {

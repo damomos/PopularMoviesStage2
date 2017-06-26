@@ -82,7 +82,16 @@ public class MoviesContentProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        switch(sUriMatcher.match(uri)){
+            case MOVIE:
+                return MoviesContract.MovieEntry.CONTENT_TYPE;
+            case MOVIE_WITH_ID:
+                return MoviesContract.MovieEntry.CONTENT_ITEM_TYPE;
+            case FAVORITES:
+                return MoviesContract.FavoriteEntry.CONTENT_TYPE;
+            default:
+                throw new IllegalArgumentException("Unsupported URI: "+uri);
+        }
     }
 
     @Nullable
@@ -93,11 +102,11 @@ public class MoviesContentProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)){
             case MOVIE_WITH_ID:
-            {
+
                 String movieId = uri.getLastPathSegment();
 
                 String [] selectionArguments = new String []{movieId};
-                cursor = mMoviesDbHelper.getReadableDatabase().query(
+                cursor = db.query(
                         MoviesContract.MovieEntry.TABLE_DETAILS,
                         projection,
                         MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
@@ -107,10 +116,10 @@ public class MoviesContentProvider extends ContentProvider {
                         sortOrder);
 
                 break;
-            }
+
             case MOVIE:
-            {
-                cursor = mMoviesDbHelper.getReadableDatabase().query(
+
+                cursor = db.query(
                         MoviesContract.MovieEntry.TABLE_DETAILS,
                         projection,
                         selection,
@@ -119,11 +128,18 @@ public class MoviesContentProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            }
+
             case FAVORITES:
-                cursor = getMoviesFromReferenceTable(MoviesContract.FavoriteEntry.TABLE_FAVOURITE,
-                        projection, null, null, null);
+                cursor = db.query(
+                        MoviesContract.FavoriteEntry.TABLE_FAVOURITE,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -150,7 +166,7 @@ public class MoviesContentProvider extends ContentProvider {
             case FAVORITES:
                 id = db.insert(MoviesContract.FavoriteEntry.TABLE_FAVOURITE, null, values);
                 if (id > 0) {
-                    returnUri = MoviesContract.FavoriteEntry.CONTENT_URI;
+                    returnUri = MoviesContract.FavoriteEntry.buildFavoriteUri(id);
                 } else {
                     throw new android.database.SQLException("failed to insert into row" + uri);
                 }
@@ -221,17 +237,17 @@ public class MoviesContentProvider extends ContentProvider {
         // tableName INNER JOIN movies ON tableName.movie_id = movies._id
         sqLiteQueryBuilder.setTables(
                 tableFavourite + " INNER JOIN " + MoviesContract.MovieEntry.TABLE_DETAILS +
-                        " ON " + tableFavourite + "." + MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID_KEY +
+                        " ON " + tableFavourite + "." + MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID +
                         " = " + MoviesContract.MovieEntry.TABLE_DETAILS+ "." + MoviesContract.MovieEntry._ID
         );
 
         return sqLiteQueryBuilder.query(mMoviesDbHelper.getReadableDatabase(),
                 projection,
+                selection,
+                selectionArgs,
                 null,
                 null,
-                null,
-                null,
-                null
+                sortOrder
         );
     }
 }
