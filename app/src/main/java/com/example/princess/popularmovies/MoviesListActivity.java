@@ -49,7 +49,6 @@ public class MoviesListActivity extends AppCompatActivity implements LoaderManag
     private List<Movies> moviesList = new ArrayList<>();
     private static SharedPreferences sharedPreferences;
     private int mPosition = RecyclerView.NO_POSITION;
-    private ProgressBar mProgressBar;
     boolean isPopularMovie;
     boolean isTopratedMovie;
     boolean isFavoriteMovie;
@@ -101,7 +100,6 @@ public class MoviesListActivity extends AppCompatActivity implements LoaderManag
         isFavoriteMovie = sharedPreferences.getBoolean("favorite_key", false);
 
         if(isPopularMovie || isTopratedMovie || isFavoriteMovie){
-            Toast.makeText(getApplicationContext(),"Reading from database",Toast.LENGTH_LONG).show();
             loader = getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
         } else{
             ourView("NoRecordFound");
@@ -278,7 +276,6 @@ public class MoviesListActivity extends AppCompatActivity implements LoaderManag
     @Override
     protected void onResume() {
         super.onResume();
-        Toast.makeText(getApplicationContext(), "OnResume", Toast.LENGTH_LONG).show();
         if(loader!=null){
             //   loader.reset();
             //  moviesList.removeAll(moviesList);

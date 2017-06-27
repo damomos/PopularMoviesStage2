@@ -10,14 +10,11 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import static com.example.princess.popularmovies.data.MoviesContract.AUTHORITY;
 import static com.example.princess.popularmovies.data.MoviesContract.PATH_FAVORITE;
 import static com.example.princess.popularmovies.data.MoviesContract.PATH_MOVIE;
-
-/**
- * Created by Princess on 6/15/2017.
- */
 
 public class MoviesContentProvider extends ContentProvider {
 
@@ -36,7 +33,7 @@ public class MoviesContentProvider extends ContentProvider {
 
         uriMatcher.addURI(AUTHORITY, PATH_MOVIE, MOVIE);
         uriMatcher.addURI(AUTHORITY,PATH_MOVIE + "/#", MOVIE_WITH_ID);
-        uriMatcher.addURI(AUTHORITY, PATH_MOVIE + "/" + PATH_FAVORITE, FAVORITES);
+        uriMatcher.addURI(AUTHORITY,PATH_FAVORITE, FAVORITES);
         return uriMatcher;
     }
 
@@ -102,11 +99,11 @@ public class MoviesContentProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)){
             case MOVIE_WITH_ID:
-
+            {
                 String movieId = uri.getLastPathSegment();
-
                 String [] selectionArguments = new String []{movieId};
-                cursor = db.query(
+
+                cursor = mMoviesDbHelper.getReadableDatabase().query(
                         MoviesContract.MovieEntry.TABLE_DETAILS,
                         projection,
                         MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
@@ -116,10 +113,10 @@ public class MoviesContentProvider extends ContentProvider {
                         sortOrder);
 
                 break;
-
+            }
             case MOVIE:
-
-                cursor = db.query(
+            {
+                cursor = mMoviesDbHelper.getReadableDatabase().query(
                         MoviesContract.MovieEntry.TABLE_DETAILS,
                         projection,
                         selection,
@@ -128,9 +125,12 @@ public class MoviesContentProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-
+            }
             case FAVORITES:
-                cursor = db.query(
+                //  cursor = getMoviesFromReferenceTable(Contract.FavoriteEntry.TABLE_FAVOURITE,
+                //          projection, selection, selectionArgs, sortOrder);
+
+                cursor = mMoviesDbHelper.getReadableDatabase().query(
                         MoviesContract.FavoriteEntry.TABLE_FAVOURITE,
                         projection,
                         selection,
@@ -138,8 +138,8 @@ public class MoviesContentProvider extends ContentProvider {
                         null,
                         null,
                         sortOrder);
-                break;
 
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -158,7 +158,7 @@ public class MoviesContentProvider extends ContentProvider {
             case MOVIE:
                 id = db.insert(MoviesContract.MovieEntry.TABLE_DETAILS, null, values);
                 if (id > 0) {
-                    returnUri = MoviesContract.MovieEntry.CONTENT_URI;    //.buildStudentUri(id);
+                    returnUri = MoviesContract.MovieEntry.buildMovieUri(id);
                 } else {
                     throw new android.database.SQLException("failed to insert into row" + uri);
                 }

@@ -1,10 +1,11 @@
 package com.example.princess.popularmovies.data;
 
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-
 import com.example.princess.popularmovies.models.Movies;
+
 
 /**
  * Created by Princess on 6/19/2017.
@@ -16,9 +17,12 @@ public class FavoriteService {
 
     public FavoriteService(Context context) {
         this.context = context.getApplicationContext();
+
     }
 
+
     public void addToFavorites(Movies movie) {
+
         ContentValues cv = new ContentValues();
         cv.put(MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID, movie.getId());
         cv.put(MoviesContract.FavoriteEntry.COLUMN_TITLE, movie.getTitle());
@@ -29,7 +33,9 @@ public class FavoriteService {
         cv.put(MoviesContract.FavoriteEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
 
         context.getContentResolver().insert(MoviesContract.FavoriteEntry.CONTENT_URI, cv);
+
     }
+
 
     public void removeFromFavorites(Movies movie) {
         context.getContentResolver().delete(
@@ -48,13 +54,16 @@ public class FavoriteService {
                 null,
                 null
         );
+
         if (cursor != null) {
+
             favorite = cursor.getCount() != 0;
+
             cursor.close();
+
         }
+
         return favorite;
+
     }
-
 }
-
-
