@@ -10,16 +10,13 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
+
 
 import static com.example.princess.popularmovies.data.MoviesContract.AUTHORITY;
 import static com.example.princess.popularmovies.data.MoviesContract.PATH_FAVORITE;
-import static com.example.princess.popularmovies.data.MoviesContract.PATH_MOVIE;
 
 public class MoviesContentProvider extends ContentProvider {
 
-    public static final int MOVIE = 1;
-    public static final int MOVIE_WITH_ID = 2;
     static final int FAVORITES = 5;
 
     private MoviesDbHelper mMoviesDbHelper;
@@ -30,9 +27,6 @@ public class MoviesContentProvider extends ContentProvider {
 
     private static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-
-        uriMatcher.addURI(AUTHORITY, PATH_MOVIE, MOVIE);
-        uriMatcher.addURI(AUTHORITY,PATH_MOVIE + "/#", MOVIE_WITH_ID);
         uriMatcher.addURI(AUTHORITY,PATH_FAVORITE, FAVORITES);
         return uriMatcher;
     }
@@ -43,12 +37,12 @@ public class MoviesContentProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
 
-            case MOVIE:
+            case FAVORITES:
                 db.beginTransaction();
                 int rowsInserted = 0;
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(MoviesContract.MovieEntry.TABLE_DETAILS, null, value);
+                        long _id = db.insert(MoviesContract.FavoriteEntry.TABLE_FAVOURITE, null, value);
                         if (_id != -1) {
                             rowsInserted++;
                         }
@@ -80,10 +74,6 @@ public class MoviesContentProvider extends ContentProvider {
     @Override
     public String getType(@NonNull Uri uri) {
         switch(sUriMatcher.match(uri)){
-            case MOVIE:
-                return MoviesContract.MovieEntry.CONTENT_TYPE;
-            case MOVIE_WITH_ID:
-                return MoviesContract.MovieEntry.CONTENT_ITEM_TYPE;
             case FAVORITES:
                 return MoviesContract.FavoriteEntry.CONTENT_TYPE;
             default:
@@ -98,37 +88,7 @@ public class MoviesContentProvider extends ContentProvider {
         Cursor cursor;
 
         switch (sUriMatcher.match(uri)){
-            case MOVIE_WITH_ID:
-            {
-                String movieId = uri.getLastPathSegment();
-                String [] selectionArguments = new String []{movieId};
-
-                cursor = mMoviesDbHelper.getReadableDatabase().query(
-                        MoviesContract.MovieEntry.TABLE_DETAILS,
-                        projection,
-                        MoviesContract.MovieEntry.COLUMN_MOVIE_ID + " = ? ",
-                        selectionArguments,
-                        null,
-                        null,
-                        sortOrder);
-
-                break;
-            }
-            case MOVIE:
-            {
-                cursor = mMoviesDbHelper.getReadableDatabase().query(
-                        MoviesContract.MovieEntry.TABLE_DETAILS,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-            }
             case FAVORITES:
-                //  cursor = getMoviesFromReferenceTable(Contract.FavoriteEntry.TABLE_FAVOURITE,
-                //          projection, selection, selectionArgs, sortOrder);
 
                 cursor = mMoviesDbHelper.getReadableDatabase().query(
                         MoviesContract.FavoriteEntry.TABLE_FAVOURITE,
@@ -155,14 +115,6 @@ public class MoviesContentProvider extends ContentProvider {
         Uri returnUri;
         long id;
         switch (sUriMatcher.match(uri)) {
-            case MOVIE:
-                id = db.insert(MoviesContract.MovieEntry.TABLE_DETAILS, null, values);
-                if (id > 0) {
-                    returnUri = MoviesContract.MovieEntry.buildMovieUri(id);
-                } else {
-                    throw new android.database.SQLException("failed to insert into row" + uri);
-                }
-                break;
             case FAVORITES:
                 id = db.insert(MoviesContract.FavoriteEntry.TABLE_FAVOURITE, null, values);
                 if (id > 0) {
@@ -196,14 +148,6 @@ public class MoviesContentProvider extends ContentProvider {
         if (null == selection) selection = "1";
 
         switch (sUriMatcher.match(uri)) {
-
-            case MOVIE:
-                numRowsDeleted = mMoviesDbHelper.getWritableDatabase().delete(
-                        MoviesContract.MovieEntry.TABLE_DETAILS,
-                        selection,
-                        selectionArgs);
-
-                break;
             case FAVORITES:
                 numRowsDeleted = mMoviesDbHelper.getWritableDatabase().delete(
                         MoviesContract.FavoriteEntry.TABLE_FAVOURITE,
@@ -235,11 +179,11 @@ public class MoviesContentProvider extends ContentProvider {
         SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
 
         // tableName INNER JOIN movies ON tableName.movie_id = movies._id
-        sqLiteQueryBuilder.setTables(
-                tableFavourite + " INNER JOIN " + MoviesContract.MovieEntry.TABLE_DETAILS +
-                        " ON " + tableFavourite + "." + MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID +
-                        " = " + MoviesContract.MovieEntry.TABLE_DETAILS+ "." + MoviesContract.MovieEntry._ID
-        );
+//        sqLiteQueryBuilder.setTables(
+//                tableFavourite + " INNER JOIN " + MoviesContract.MovieEntry.TABLE_DETAILS +
+//                        " ON " + tableFavourite + "." + MoviesContract.FavoriteEntry.COLUMN_MOVIE_ID +
+//                        " = " + MoviesContract.MovieEntry.TABLE_DETAILS+ "." + MoviesContract.MovieEntry._ID
+//        );
 
         return sqLiteQueryBuilder.query(mMoviesDbHelper.getReadableDatabase(),
                 projection,

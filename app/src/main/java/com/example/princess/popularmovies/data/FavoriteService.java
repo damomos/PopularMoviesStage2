@@ -20,7 +20,6 @@ public class FavoriteService {
 
     }
 
-
     public void addToFavorites(Movies movie) {
 
         ContentValues cv = new ContentValues();
@@ -35,7 +34,6 @@ public class FavoriteService {
         context.getContentResolver().insert(MoviesContract.FavoriteEntry.CONTENT_URI, cv);
 
     }
-
 
     public void removeFromFavorites(Movies movie) {
         context.getContentResolver().delete(
@@ -56,14 +54,9 @@ public class FavoriteService {
         );
 
         if (cursor != null) {
-
             favorite = cursor.getCount() != 0;
-
             cursor.close();
-
         }
-
         return favorite;
-
     }
 }

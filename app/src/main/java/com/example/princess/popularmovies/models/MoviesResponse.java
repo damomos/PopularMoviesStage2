@@ -2,6 +2,7 @@ package com.example.princess.popularmovies.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**

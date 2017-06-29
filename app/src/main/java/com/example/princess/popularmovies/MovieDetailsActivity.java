@@ -2,7 +2,6 @@ package com.example.princess.popularmovies;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;

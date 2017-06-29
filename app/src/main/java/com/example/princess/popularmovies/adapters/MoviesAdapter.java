@@ -27,7 +27,6 @@ import static android.os.Build.VERSION_CODES.M;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesViewHolder>{
 
-    private Cursor mCursor;
     private Context mContext;
     private List<Movies> moviesList;
 
@@ -69,8 +68,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesView
 
     @Override
     public void onBindViewHolder(MoviesAdapter.MoviesViewHolder holder, int position) {
-//        mCursor.moveToPosition(position);
-//        String posterPath_url = "http://image.tmdb.org/t/p/w500" + mCursor.getString();
 
         Movies image = moviesList.get(position);
         String posterPath_url = "http://image.tmdb.org/t/p/w500" + image.getPosterPath();
