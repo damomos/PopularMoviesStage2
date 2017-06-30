@@ -36,9 +36,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MoviesListActivity extends AppCompatActivity
-        implements SharedPreferences.OnSharedPreferenceChangeListener, LoaderManager.LoaderCallbacks<Cursor>
-{
+public class MoviesListActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = MoviesListActivity.class.getSimpleName();
 
@@ -84,7 +82,6 @@ public class MoviesListActivity extends AppCompatActivity
         } else {
             mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4));
         }
-        checkSortOrder();
     }
 
 
@@ -95,10 +92,13 @@ public class MoviesListActivity extends AppCompatActivity
         isFavoriteMovie = sharedPreferences.getBoolean("favorite_key", false);
 
         if (isPopularMovie) {
+            moviesList.clear();
             popular();
         } else if (isTopratedMovie) {
+            moviesList.clear();
             toprated();
         } else if (isFavoriteMovie){
+            moviesList.clear();
             loader = getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
         }
     }
@@ -263,7 +263,6 @@ public class MoviesListActivity extends AppCompatActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor){
 
         if(cursor.getCount()== 0){
-            //Toast.makeText(getApplicationContext(), "No data found", Toast.LENGTH_LONG).show();
             ourView("NoRecordFound");
         }else{
 
@@ -293,4 +292,5 @@ public class MoviesListActivity extends AppCompatActivity
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         checkSortOrder();
     }
+
 }
